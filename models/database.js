@@ -244,29 +244,37 @@ class Database {
 
   async createDefaultAdmin() {
     try {
+      console.log(`Creating default admin user... Database type: ${this.dbType}`);
+      
       // Use database-specific LIMIT syntax
-      const limitClause = this.dbType === 'mssql' ? 'TOP 1' : 'LIMIT 1';
       const query = this.dbType === 'mssql' 
         ? 'SELECT TOP 1 id FROM users WHERE role = ?'
         : 'SELECT id FROM users WHERE role = ? LIMIT 1';
       
+      console.log(`Checking if admin exists with query: ${query}`);
       const adminExists = await this.get(query, ['super_admin']);
+      console.log('Admin exists check result:', adminExists);
       
       if (!adminExists) {
+        console.log('No admin found, creating default admin...');
         const hashedPassword = await bcrypt.hash('admin123', parseInt(process.env.BCRYPT_ROUNDS) || 12);
         
-        await this.run(`
+        const insertResult = await this.run(`
           INSERT INTO users (username, email, password, role, first_name, last_name)
           VALUES (?, ?, ?, ?, ?, ?)
         `, ['admin', 'admin@company.com', hashedPassword, 'super_admin', 'System', 'Administrator']);
         
+        console.log('Insert result:', insertResult);
         console.log('Default admin user created:');
         console.log('Username: admin');
         console.log('Password: admin123');
         console.log('Please change this password after first login!');
+      } else {
+        console.log('Admin user already exists, skipping creation');
       }
     } catch (err) {
       console.error('Error creating default admin:', err);
+      console.error('Error details:', err.message);
     }
   }
 

@@ -55,10 +55,12 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    secure: false, // Set to false for Azure App Service (handles HTTPS termination)
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     httpOnly: true
-  }
+  },
+  // Use default memory store but with cleanup to prevent memory leaks
+  name: 'sessionId'
 }));
 
 // Routes
@@ -110,6 +112,97 @@ app.get('/init-database', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Error initializing database',
+      error: error.message
+    });
+  }
+});
+
+// Debug endpoint to check users (remove after troubleshooting)
+app.get('/debug-users', async (req, res) => {
+  try {
+    const db = require('./models/database');
+    const User = require('./models/User');
+    
+    const users = await db.all('SELECT id, username, email, role, active, password, created_at FROM users ORDER BY created_at DESC');
+    
+    // Test password verification for admin user
+    let passwordTest = null;
+    if (users.length > 0) {
+      const adminUser = users.find(u => u.username === 'admin');
+      if (adminUser) {
+        passwordTest = {
+          username: adminUser.username,
+          hasPassword: !!adminUser.password,
+          passwordLength: adminUser.password ? adminUser.password.length : 0,
+          passwordStartsWith: adminUser.password ? adminUser.password.substring(0, 10) + '...' : 'N/A',
+          verifyTest: await User.verifyPassword('admin123', adminUser.password)
+        };
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      message: `Found ${users.length} users`,
+      users: users.map(u => ({
+        id: u.id,
+        username: u.username,
+        email: u.email,
+        role: u.role,
+        active: u.active,
+        hasPassword: !!u.password,
+        created_at: u.created_at
+      })),
+      dbType: process.env.DB_TYPE,
+      currentDbInstance: db.dbType,
+      passwordTest: passwordTest
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching users',
+      error: error.message,
+      dbType: process.env.DB_TYPE
+    });
+  }
+});
+
+// Test login endpoint (remove after troubleshooting)
+app.post('/debug-login', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    const { username = 'admin', password = 'admin123' } = req.body;
+    
+    console.log(`Debug login attempt: ${username} / ${password}`);
+    
+    const user = await User.findByUsername(username);
+    console.log('Found user:', user ? { id: user.id, username: user.username, active: user.active } : 'No user found');
+    
+    if (!user) {
+      return res.json({ 
+        success: false, 
+        message: 'User not found',
+        username: username
+      });
+    }
+    
+    const isValidPassword = await User.verifyPassword(password, user.password);
+    console.log('Password verification result:', isValidPassword);
+    
+    res.json({ 
+      success: isValidPassword, 
+      message: isValidPassword ? 'Login successful' : 'Invalid password',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        active: user.active
+      }
+    });
+  } catch (error) {
+    console.error('Debug login error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error during login test',
       error: error.message
     });
   }
