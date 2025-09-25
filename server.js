@@ -42,8 +42,16 @@ app.use(morgan('combined'));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files - enhanced configuration
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d', // Cache static files for 1 day
+  etag: true,
+  lastModified: true
+}));
+
+// Additional static file route for CSS specifically (debugging)
+app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
+app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
 
 // Body parsing middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -62,6 +70,42 @@ app.use(session({
   // Use default memory store but with cleanup to prevent memory leaks
   name: 'sessionId'
 }));
+
+// Debug route to check CSS file accessibility
+app.get('/debug-css', (req, res) => {
+  const fs = require('fs');
+  const cssPath = path.join(__dirname, 'public', 'css', 'style.css');
+  
+  fs.access(cssPath, fs.constants.F_OK, (err) => {
+    if (err) {
+      res.json({ 
+        error: 'CSS file not found', 
+        path: cssPath,
+        exists: false 
+      });
+    } else {
+      fs.readFile(cssPath, 'utf8', (err, data) => {
+        if (err) {
+          res.json({ 
+            error: 'Could not read CSS file', 
+            path: cssPath,
+            exists: true,
+            readable: false 
+          });
+        } else {
+          res.json({ 
+            success: true,
+            path: cssPath,
+            exists: true,
+            readable: true,
+            size: data.length,
+            preview: data.substring(0, 200) + '...'
+          });
+        }
+      });
+    }
+  });
+});
 
 // Routes
 app.use('/', publicRoutes);
