@@ -1,0 +1,119 @@
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-person-<%= user ? 'gear' : 'plus' %>"></i> 
+            <%= user ? 'Edit User' : 'Create New User' %>
+        </h2>
+        <a href="/admin/users" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Users
+        </a>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    
+                    <form method="POST" action="<%= user ? `/admin/users/${user.id}/edit` : '/admin/users/new' %>">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" 
+                                           value="<%= user ? user.first_name : (typeof formData !== 'undefined' ? formData.firstName || '' : '') %>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" 
+                                           value="<%= user ? user.last_name : (typeof formData !== 'undefined' ? formData.lastName || '' : '') %>" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           value="<%= user ? user.username : (typeof formData !== 'undefined' ? formData.username || '' : '') %>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="<%= user ? user.email : (typeof formData !== 'undefined' ? formData.email || '' : '') %>" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <% if (!user) { %>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="form-text">Password must be at least 6 characters long</div>
+                            </div>
+                        <% } %>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role *</label>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="">Select Role</option>
+                                        <option value="staff" <%= (user && user.role === 'staff') || (typeof formData !== 'undefined' && formData.role === 'staff') ? 'selected' : '' %>>
+                                            Staff - Can manage tickets and own profile
+                                        </option>
+                                        <option value="admin" <%= (user && user.role === 'admin') || (typeof formData !== 'undefined' && formData.role === 'admin') ? 'selected' : '' %>>
+                                            Admin - Can manage tickets and users
+                                        </option>
+                                        <option value="super_admin" <%= (user && user.role === 'super_admin') || (typeof formData !== 'undefined' && formData.role === 'super_admin') ? 'selected' : '' %>>
+                                            Super Admin - Full access to everything
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <% if (user) { %>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="active" class="form-label">Status *</label>
+                                        <select class="form-select" id="active" name="active" required>
+                                            <option value="1" <%= user.active === 1 ? 'selected' : '' %>>Active</option>
+                                            <option value="0" <%= user.active === 0 ? 'selected' : '' %>>Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Role Permissions:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li><strong>Staff:</strong> Can view and manage tickets, update own profile</li>
+                                <li><strong>Admin:</strong> All staff permissions + user management</li>
+                                <li><strong>Super Admin:</strong> All permissions + create/delete users</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/admin/users" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> 
+                                <%= user ? 'Update User' : 'Create User' %>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

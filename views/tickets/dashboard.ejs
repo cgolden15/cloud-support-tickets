@@ -1,0 +1,176 @@
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-speedometer2"></i> IT Dashboard</h2>
+        <div>
+            <a href="/tickets/list" class="btn btn-outline-primary">View All Tickets</a>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4><%= stats.byStatus.open || 0 %></h4>
+                            <p class="mb-0">Open Tickets</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-circle-fill" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4><%= stats.byStatus.in_progress || 0 %></h4>
+                            <p class="mb-0">In Progress</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-clockwise" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4><%= stats.byStatus.resolved || 0 %></h4>
+                            <p class="mb-0">Resolved</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4><%= stats.byStatus.closed || 0 %></h4>
+                            <p class="mb-0">Closed</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-archive-fill" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Priority Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Open Tickets by Priority</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-danger"><%= stats.byPriority.urgent || 0 %></h3>
+                            <p class="mb-0">Urgent</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-danger"><%= stats.byPriority.high || 0 %></h3>
+                            <p class="mb-0">High</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-warning"><%= stats.byPriority.medium || 0 %></h3>
+                            <p class="mb-0">Medium</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 class="text-success"><%= stats.byPriority.low || 0 %></h3>
+                            <p class="mb-0">Low</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Tickets -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Recent Tickets</h5>
+            <a href="/tickets/list" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body">
+            <% if (recentTickets.length === 0) { %>
+                <div class="text-center py-4">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted mt-2">No tickets yet</h5>
+                    <p class="text-muted">New tickets will appear here</p>
+                </div>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Submitter</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% recentTickets.forEach(ticket => { %>
+                                <tr>
+                                    <td><strong>#<%= ticket.id %></strong></td>
+                                    <td>
+                                        <a href="/tickets/<%= ticket.id %>" class="text-decoration-none">
+                                            <%= ticket.title %>
+                                        </a>
+                                    </td>
+                                    <td><%= ticket.submitter_name %></td>
+                                    <td>
+                                        <span class="priority-<%= ticket.priority %>">
+                                            <%= ticket.priority.toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-<%= ticket.status === 'open' ? 'primary' : ticket.status === 'in_progress' ? 'warning' : ticket.status === 'resolved' ? 'success' : 'secondary' %>">
+                                            <%= ticket.status.replace('_', ' ').toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if (ticket.assigned_to) { %>
+                                            <%= ticket.first_name %> <%= ticket.last_name %>
+                                        <% } else { %>
+                                            <span class="text-muted">Unassigned</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(ticket.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/tickets/<%= ticket.id %>" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

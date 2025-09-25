@@ -1,0 +1,110 @@
+<div class="py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-plus-circle"></i> Submit IT Support Ticket
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    
+                    <% if (success) { %>
+                        <div class="alert alert-success">
+                            <%= success %>
+                        </div>
+                        <div class="text-center">
+                            <a href="/submit" class="btn btn-primary">Submit Another Ticket</a>
+                            <a href="/" class="btn btn-secondary">Back to Home</a>
+                        </div>
+                    <% } else { %>
+                        <form method="POST" action="/submit">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="submitterName" class="form-label">Your Name *</label>
+                                        <input type="text" class="form-control" id="submitterName" name="submitterName" 
+                                               value="<%= typeof formData !== 'undefined' ? formData.submitterName || '' : '' %>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="submitterEmail" class="form-label">Your Email *</label>
+                                        <input type="email" class="form-control" id="submitterEmail" name="submitterEmail" 
+                                               value="<%= typeof formData !== 'undefined' ? formData.submitterEmail || '' : '' %>" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Issue Title *</label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                       value="<%= typeof formData !== 'undefined' ? formData.title || '' : '' %>" 
+                                       placeholder="Brief description of the issue" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="category" class="form-label">Category *</label>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="">Select Category</option>
+                                            <option value="Hardware" <%= typeof formData !== 'undefined' && formData.category === 'Hardware' ? 'selected' : '' %>>Hardware Issues</option>
+                                            <option value="Software" <%= typeof formData !== 'undefined' && formData.category === 'Software' ? 'selected' : '' %>>Software Issues</option>
+                                            <option value="Network" <%= typeof formData !== 'undefined' && formData.category === 'Network' ? 'selected' : '' %>>Network/Internet</option>
+                                            <option value="Email" <%= typeof formData !== 'undefined' && formData.category === 'Email' ? 'selected' : '' %>>Email Issues</option>
+                                            <option value="Account" <%= typeof formData !== 'undefined' && formData.category === 'Account' ? 'selected' : '' %>>Account Access</option>
+                                            <option value="Request" <%= typeof formData !== 'undefined' && formData.category === 'Request' ? 'selected' : '' %>>Software Request</option>
+                                            <option value="Other" <%= typeof formData !== 'undefined' && formData.category === 'Other' ? 'selected' : '' %>>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="priority" class="form-label">Priority *</label>
+                                        <select class="form-select" id="priority" name="priority" required>
+                                            <option value="">Select Priority</option>
+                                            <option value="low" <%= typeof formData !== 'undefined' && formData.priority === 'low' ? 'selected' : '' %>>Low - Not urgent</option>
+                                            <option value="medium" <%= typeof formData !== 'undefined' && formData.priority === 'medium' ? 'selected' : '' %> selected>Medium - Normal priority</option>
+                                            <option value="high" <%= typeof formData !== 'undefined' && formData.priority === 'high' ? 'selected' : '' %>>High - Important</option>
+                                            <option value="urgent" <%= typeof formData !== 'undefined' && formData.priority === 'urgent' ? 'selected' : '' %>>Urgent - Critical issue</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description *</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" 
+                                          placeholder="Please describe the issue in detail. Include any error messages, steps you've tried, and when the problem started." required><%= typeof formData !== 'undefined' ? formData.description || '' : '' %></textarea>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Tips for faster resolution:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Be as specific as possible about the problem</li>
+                                    <li>Include any error messages you see</li>
+                                    <li>Mention what you were doing when the issue occurred</li>
+                                    <li>Include your computer model/operating system if relevant</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Submit Ticket
+                                </button>
+                            </div>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

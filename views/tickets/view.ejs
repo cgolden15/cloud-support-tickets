@@ -1,0 +1,248 @@
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Ticket #<%= ticket.id %>: <%= ticket.title %></h2>
+            <p class="text-muted mb-0">
+                Submitted by <%= ticket.submitter_name %> on <%= new Date(ticket.created_at).toLocaleDateString() %>
+            </p>
+        </div>
+        <div>
+            <a href="/tickets/list" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+    
+    <!-- Flash Messages -->
+    <% if (typeof req !== 'undefined' && req.session && req.session.flash) { %>
+        <% if (req.session.flash.success) { %>
+            <div class="alert alert-success alert-dismissible fade show">
+                <%= req.session.flash.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (req.session.flash.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <%= req.session.flash.error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+    <% } %>
+    
+    <div class="row">
+        <!-- Ticket Details -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ticket Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/tickets/<%= ticket.id %>/update">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" value="<%= ticket.title %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="Hardware" <%= ticket.category === 'Hardware' ? 'selected' : '' %>>Hardware</option>
+                                    <option value="Software" <%= ticket.category === 'Software' ? 'selected' : '' %>>Software</option>
+                                    <option value="Network" <%= ticket.category === 'Network' ? 'selected' : '' %>>Network</option>
+                                    <option value="Email" <%= ticket.category === 'Email' ? 'selected' : '' %>>Email</option>
+                                    <option value="Account" <%= ticket.category === 'Account' ? 'selected' : '' %>>Account</option>
+                                    <option value="Request" <%= ticket.category === 'Request' ? 'selected' : '' %>>Request</option>
+                                    <option value="Other" <%= ticket.category === 'Other' ? 'selected' : '' %>>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required><%= ticket.description %></textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="low" <%= ticket.priority === 'low' ? 'selected' : '' %>>Low</option>
+                                    <option value="medium" <%= ticket.priority === 'medium' ? 'selected' : '' %>>Medium</option>
+                                    <option value="high" <%= ticket.priority === 'high' ? 'selected' : '' %>>High</option>
+                                    <option value="urgent" <%= ticket.priority === 'urgent' ? 'selected' : '' %>>Urgent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
+                                    <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+                                    <option value="resolved" <%= ticket.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+                                    <option value="closed" <%= ticket.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="assignedTo" class="form-label">Assign To</label>
+                                <select class="form-select" id="assignedTo" name="assignedTo">
+                                    <option value="">Unassigned</option>
+                                    <% users.forEach(user => { %>
+                                        <option value="<%= user.id %>" <%= ticket.assigned_to == user.id ? 'selected' : '' %>>
+                                            <%= user.first_name %> <%= user.last_name %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Update Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Comments Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Comments & Updates</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add Comment Form -->
+                    <form method="POST" action="/tickets/<%= ticket.id %>/comment" class="mb-4">
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Add Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Add a comment or update..." required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-chat-left-text"></i> Add Comment
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Comments List -->
+                    <% if (comments.length === 0) { %>
+                        <div class="text-center py-3 text-muted">
+                            <i class="bi bi-chat-square-text" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">No comments yet</p>
+                        </div>
+                    <% } else { %>
+                        <div class="comments-list">
+                            <% comments.forEach(comment => { %>
+                                <div class="border-start border-3 border-primary ps-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <strong><%= comment.first_name %> <%= comment.last_name %></strong>
+                                        <small class="text-muted"><%= new Date(comment.created_at).toLocaleString() %></small>
+                                    </div>
+                                    <p class="mb-0"><%= comment.comment %></p>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Ticket Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ticket Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-6">Submitter:</dt>
+                        <dd class="col-sm-6"><%= ticket.submitter_name %></dd>
+                        
+                        <dt class="col-sm-6">Email:</dt>
+                        <dd class="col-sm-6">
+                            <a href="mailto:<%= ticket.submitter_email %>" class="text-decoration-none">
+                                <%= ticket.submitter_email %>
+                            </a>
+                        </dd>
+                        
+                        <dt class="col-sm-6">Created:</dt>
+                        <dd class="col-sm-6"><%= new Date(ticket.created_at).toLocaleString() %></dd>
+                        
+                        <dt class="col-sm-6">Last Updated:</dt>
+                        <dd class="col-sm-6"><%= new Date(ticket.updated_at).toLocaleString() %></dd>
+                        
+                        <dt class="col-sm-6">Current Status:</dt>
+                        <dd class="col-sm-6">
+                            <span class="badge bg-<%= ticket.status === 'open' ? 'primary' : ticket.status === 'in_progress' ? 'warning' : ticket.status === 'resolved' ? 'success' : 'secondary' %>">
+                                <%= ticket.status.replace('_', ' ').toUpperCase() %>
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-6">Priority:</dt>
+                        <dd class="col-sm-6">
+                            <span class="priority-<%= ticket.priority %>">
+                                <i class="bi bi-<%= ticket.priority === 'urgent' ? 'exclamation-triangle-fill' : ticket.priority === 'high' ? 'exclamation-circle-fill' : ticket.priority === 'medium' ? 'info-circle-fill' : 'check-circle-fill' %>"></i>
+                                <%= ticket.priority.toUpperCase() %>
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-6">Assigned To:</dt>
+                        <dd class="col-sm-6">
+                            <% if (ticket.assigned_to) { %>
+                                <%= ticket.first_name %> <%= ticket.last_name %>
+                            <% } else { %>
+                                <span class="text-muted">Unassigned</span>
+                            <% } %>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <% if (ticket.status === 'open') { %>
+                            <form method="POST" action="/tickets/<%= ticket.id %>/status" class="d-inline">
+                                <input type="hidden" name="status" value="in_progress">
+                                <input type="hidden" name="assignedTo" value="<%= currentUser.id %>">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="bi bi-play-circle"></i> Start Working
+                                </button>
+                            </form>
+                        <% } %>
+                        
+                        <% if (ticket.status === 'in_progress') { %>
+                            <form method="POST" action="/tickets/<%= ticket.id %>/status" class="d-inline">
+                                <input type="hidden" name="status" value="resolved">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-check-circle"></i> Mark Resolved
+                                </button>
+                            </form>
+                        <% } %>
+                        
+                        <% if (ticket.status === 'resolved') { %>
+                            <form method="POST" action="/tickets/<%= ticket.id %>/status" class="d-inline">
+                                <input type="hidden" name="status" value="closed">
+                                <button type="submit" class="btn btn-secondary w-100">
+                                    <i class="bi bi-archive"></i> Close Ticket
+                                </button>
+                            </form>
+                        <% } %>
+                        
+                        <% if (ticket.status === 'closed' || ticket.status === 'resolved') { %>
+                            <form method="POST" action="/tickets/<%= ticket.id %>/status" class="d-inline">
+                                <input type="hidden" name="status" value="open">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-arrow-clockwise"></i> Reopen Ticket
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

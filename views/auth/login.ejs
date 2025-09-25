@@ -1,0 +1,59 @@
+<div class="py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-shield-lock"></i> Staff Login
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    
+                    <form method="POST" action="/auth/login">
+                        <input type="hidden" name="redirect" value="<%= redirect %>">
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <a href="/" class="text-decoration-none">← Back to Public Portal</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Default Admin Account</h6>
+                    <p class="card-text small text-muted">
+                        <strong>Username:</strong> admin<br>
+                        <strong>Password:</strong> admin123<br>
+                        <em>Please change this password after first login!</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

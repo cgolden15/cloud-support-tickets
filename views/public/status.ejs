@@ -1,0 +1,132 @@
+<div class="py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-search"></i> Check Ticket Status
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                    
+                    <% if (!ticket) { %>
+                        <p class="mb-4">Enter your ticket ID and email address to check the status of your support request.</p>
+                        
+                        <form method="POST" action="/status">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ticketId" class="form-label">Ticket ID *</label>
+                                        <input type="number" class="form-control" id="ticketId" name="ticketId" 
+                                               placeholder="e.g., 123" min="1" required>
+                                        <div class="form-text">The ticket ID was provided when you submitted your request</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Your Email *</label>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               placeholder="your.email@company.com" required>
+                                        <div class="form-text">Use the same email you used to submit the ticket</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/" class="btn btn-secondary me-md-2">Back to Home</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> Check Status
+                                </button>
+                            </div>
+                        </form>
+                    <% } else { %>
+                        <!-- Ticket Details -->
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> Ticket found! Here are the details:
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4>Ticket #<%= ticket.id %>: <%= ticket.title %></h4>
+                                <p class="text-muted">Submitted by <%= ticket.submitter_name %> on <%= new Date(ticket.created_at).toLocaleDateString() %></p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <span class="badge bg-<%= ticket.status === 'open' ? 'primary' : ticket.status === 'in_progress' ? 'warning' : ticket.status === 'resolved' ? 'success' : 'secondary' %> fs-6">
+                                    <%= ticket.status.replace('_', ' ').toUpperCase() %>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Category:</strong> <%= ticket.category %>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Priority:</strong> 
+                                <span class="priority-<%= ticket.priority %>">
+                                    <%= ticket.priority.toUpperCase() %>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <div class="bg-light p-3 rounded mt-2">
+                                <%= ticket.description %>
+                            </div>
+                        </div>
+                        
+                        <% if (ticket.assigned_to) { %>
+                            <div class="mb-3">
+                                <strong>Assigned to:</strong> <%= ticket.first_name %> <%= ticket.last_name %>
+                            </div>
+                        <% } %>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Created:</strong> <%= new Date(ticket.created_at).toLocaleString() %>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Last Updated:</strong> <%= new Date(ticket.updated_at).toLocaleString() %>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>What happens next?</strong>
+                            <ul class="mb-0 mt-2">
+                                <% if (ticket.status === 'open') { %>
+                                    <li>Your ticket has been received and is waiting to be assigned to a technician</li>
+                                    <li>You will be contacted once work begins on your request</li>
+                                <% } else if (ticket.status === 'in_progress') { %>
+                                    <li>A technician is actively working on your issue</li>
+                                    <li>You may be contacted for additional information</li>
+                                <% } else if (ticket.status === 'resolved') { %>
+                                    <li>The issue has been resolved by our team</li>
+                                    <li>Please test the solution and contact us if you need further assistance</li>
+                                <% } else if (ticket.status === 'closed') { %>
+                                    <li>This ticket has been closed</li>
+                                    <li>If you continue to experience issues, please submit a new ticket</li>
+                                <% } %>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/status" class="btn btn-secondary me-md-2">Check Another Ticket</a>
+                            <a href="/submit" class="btn btn-primary">Submit New Ticket</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

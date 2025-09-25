@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'IT Ticketing System' %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-gear-fill"></i> IT Ticketing System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/submit"><i class="bi bi-plus-circle"></i> Submit Ticket</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/status"><i class="bi bi-search"></i> Check Status</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login"><i class="bi bi-box-arrow-in-right"></i> Staff Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <main class="col-12">
+            <div class="py-4">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="text-center mb-5">
+                            <h1 class="display-4">IT Support Portal</h1>
+                            <p class="lead">Submit your IT support requests and track their progress</p>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-plus-circle-fill text-primary" style="font-size: 3rem;"></i>
+                                        <h4 class="card-title mt-3">Submit a Ticket</h4>
+                                        <p class="card-text">Report technical issues, request software, or get help with IT problems.</p>
+                                        <a href="/submit" class="btn btn-primary">Submit New Ticket</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-search text-info" style="font-size: 3rem;"></i>
+                                        <h4 class="card-title mt-3">Check Status</h4>
+                                        <p class="card-text">Track the progress of your existing support tickets.</p>
+                                        <a href="/status" class="btn btn-info">Check Ticket Status</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 text-center">
+                            <hr>
+                            <p class="text-muted">
+                                <strong>Need immediate assistance?</strong><br>
+                                For urgent issues, please contact IT support directly at: 
+                                <strong>support@company.com</strong> or <strong>(555) 123-4567</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
