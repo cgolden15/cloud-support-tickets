@@ -244,7 +244,13 @@ class Database {
 
   async createDefaultAdmin() {
     try {
-      const adminExists = await this.get('SELECT id FROM users WHERE role = ? LIMIT 1', ['super_admin']);
+      // Use database-specific LIMIT syntax
+      const limitClause = this.dbType === 'mssql' ? 'TOP 1' : 'LIMIT 1';
+      const query = this.dbType === 'mssql' 
+        ? 'SELECT TOP 1 id FROM users WHERE role = ?'
+        : 'SELECT id FROM users WHERE role = ? LIMIT 1';
+      
+      const adminExists = await this.get(query, ['super_admin']);
       
       if (!adminExists) {
         const hashedPassword = await bcrypt.hash('admin123', parseInt(process.env.BCRYPT_ROUNDS) || 12);
