@@ -76,6 +76,45 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Database initialization endpoint (for production deployment)
+app.get('/init-database', async (req, res) => {
+  try {
+    const { spawn } = require('child_process');
+    const initProcess = spawn('node', ['scripts/initDb.js']);
+    
+    let output = '';
+    initProcess.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    
+    initProcess.stderr.on('data', (data) => {
+      output += data.toString();
+    });
+    
+    initProcess.on('close', (code) => {
+      if (code === 0) {
+        res.json({ 
+          success: true, 
+          message: 'Database initialized successfully',
+          output: output
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: 'Database initialization failed',
+          output: output
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error initializing database',
+      error: error.message
+    });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).render('error', { 
